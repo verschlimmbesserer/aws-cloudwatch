@@ -1,0 +1,25 @@
+---
+
+- name: Ensure awslogs-agent setup script is installed
+  ansible.builtin.apt:
+    deb: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+    state: present
+
+- name: Ensure main config is installed
+  ansible.builtin.template:
+    src: config.j2
+    dest: /home/root/.aws/config
+    owner: root
+    group: root
+    mode: "0600"
+  register: main
+
+- name: Ensure application config is installed
+  ansible.builtin.template:
+    src: amazon-cloudwatch-agent.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Restart amazon-cloudwatch-agent
